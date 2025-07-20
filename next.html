@@ -1,158 +1,152 @@
 <html><body><p>
-npm init -y
- 
- index.js 
- -- This file sets up and runs the Express server, connects to MongoDB, loads routes, and uses middleware.
- 
-	import express from "express";
-	import mongoose from "mongoose";
-	import bodyParser from "body-parser";
-	import dotenv from "dotenv";
-	import route from "./routes/userRoute.js";
-	import cors from "cors";
+npm init -y<br>
+<br>
+index.js<br>
+-- This file sets up and runs the Express server, connects to MongoDB, loads routes, and uses middleware.<br>
+<br>
+	import express from "express";<br>
+	import mongoose from "mongoose";<br>
+	import bodyParser from "body-parser";<br>
+	import dotenv from "dotenv";<br>
+	import route from "./routes/userRoute.js";<br>
+	import cors from "cors";<br>
+<br>
+	const app = express();<br>
+	app.use(cors());<br>
+<br>
+	app.use(bodyParser.json());<br>
+	dotenv.config();<br>
+<br>
+	const PORT = process.env.PORT || 8000;<br>
+	const MONGO_URI = process.env.MONGO_URI;<br>
+<br>
+	mongoose<br>
+		.connect(MONGO_URI)<br>
+		.then(() => {<br>
+    console.log("Connected to MongoDB");<br>
+	})<br>
+	.catch((err) => {<br>
+    console.error("MongoDB connection error:", err);<br>
+	});<br>
+<br>
+	app.listen(PORT, () => {<br>
+		console.log(Server is running on port ${PORT});<br>
+	});<br>
+<br>
+	app.use("/api/user", route);<br>
+<br>
+<br>
+userModel.js<br>
+	import mongoose from "mongoose";<br>
+<br>
+	const userSchema = new mongoose.Schema({<br>
+	name: {<br>
+		type: String,<br>
+		required: true,<br>
+		trim: true,<br>
+		minlength: 3,<br>
+		maxlength: 50,<br>
+	},<br>
+	email: {<br>
+		type: String,<br>
+		required: true,<br>
+		unique: true,<br>
+	},<br>
+	address: {<br>
+		type: String,<br>
+		required: true,<br>
+	},<br>
+	});<br>
+<br>
+	export default mongoose.model("User", userSchema);<br>
+<br>
+<br>
+userController<br>
+--This file handles CRUD operations: Create, Read (Fetch), Update, Delete users from the MongoDB database using Mongoose.<br>
+<br>
+	import User from "../model/userModel.js";<br>
+	import mongoose from "mongoose";<br>
+<br>
+	// Controller function to fetch users<br>
+	export const fetch = async (req, res) => {<br>
+	try {<br>
+		const users = await User.find();<br>
+		if (users.length === 0) {<br>
+			return res.status(404).json({ message: "No users found" });<br>
+		}<br>
+		res.status(200).json(users);<br>
+	} catch (error) {<br>
+		res.status(500).json({ message: error.message });<br>
+	}<br>
+	};<br>
+<br>
+	// Controller function to create a new user<br>
+	export const create = async (req, res) => {<br>
+	try {<br>
+		const userData = new User(req.body);<br>
+		const { email } = userData;<br>
+<br>
+		const userExists = await User.findOne({ email });<br>
+		if (userExists) {<br>
+			return res.status(400).json({ message: "User already exists" });<br>
+		}<br>
+<br>
+    const savedUser = await userData.save();<br>
+    res.status(201).json(savedUser);<br>
+		} catch (error) {<br>
+			res.status(500).json({ message: error.message });<br>
+	}<br>
+	};<br>
+<br>
+	// Controller function to update a user<br>
+	export const update = async (req, res) => {<br>
+	try {<br>
+		const { id } = req.params;<br>
+		const updatedUser = await User.findByIdAndUpdate(id, req.body, {<br>
+		new: true,<br>
+	});<br>
+    if (!updatedUser) {<br>
+      return res.status(404).json({ message: "User not found" });<br>
+    }<br>
+    res.status(200).json(updatedUser);<br>
+	} catch (error) {<br>
+		res.status(500).json({ message: error.message });<br>
+	}<br>
+	};<br>
+<br>
+	// Controller function to delete a user<br>
+	export const deleteUser = async (req, res) => {<br>
+	try {<br>
+		const { id } = req.params;<br>
+		const deletedUser = await User.findByIdAndDelete(id);<br>
+		if (!deletedUser) {<br>
+			return res.status(404).json({ message: "User not found" });<br>
+		}<br>
+    res.status(200).json({ message: "User deleted successfully" });<br>
+	} catch (error) {<br>
+		res.status(500).json({ message: error.message });<br>
+	}<br>
+	};<br>
+<br>
+<br>
+userRoutes<br>
+--This file defines the API endpoints and connects them to the controller functions (create, fetch, update, deleteUser) from userController.js.<br>
+<br>
+	import express from "express";<br>
+	import {<br>
+		fetch,<br>
+		create,<br>
+		update,<br>
+		deleteUser,<br>
+	} from "../controller/userController.js";<br>
+<br>
+	const route = express.Router();<br>
+<br>
+	route.post("/create", create);<br>
+	route.get("/getAllUser", fetch);<br>
+	route.put("/update/:id", update);<br>
+	route.delete("/delete/:id", deleteUser);<br>
+<br>
+	export default route;<br>
 
-	const app = express();
-	app.use(cors());
-
-	app.use(bodyParser.json());
-	dotenv.config();
-
-	const PORT = process.env.PORT || 8000;
-	const MONGO_URI = process.env.MONGO_URI;
-
-	mongoose
-		.connect(MONGO_URI)
-		.then(() => {
-    console.log("Connected to MongoDB");
-	})
-	.catch((err) => {
-    console.error("MongoDB connection error:", err);
-	});
-
-	app.listen(PORT, () => {
-		console.log(Server is running on port ${PORT});
-	});
-
-	app.use("/api/user", route);
-
-
-
-
-userModel.js
-	import mongoose from "mongoose";
-
-	const userSchema = new mongoose.Schema({
-	name: {
-		type: String,
-		required: true,
-		trim: true,
-		minlength: 3,
-		maxlength: 50,
-	},
-	email: {
-		type: String,
-		required: true,
-		unique: true,
-	},
-	address: {
-		type: String,
-		required: true,
-	},
-	});
-
-	export default mongoose.model("User", userSchema);
-
-
-
- userController
- --This file handles CRUD operations: Create, Read (Fetch), Update, Delete users from the MongoDB database using Mongoose.
- 
- 
-	import User from "../model/userModel.js";
-	import mongoose from "mongoose";
-
-	// Controller function to fetch users
-	export const fetch = async (req, res) => {
-	try {
-		const users = await User.find();
-		if (users.length === 0) {
-			return res.status(404).json({ message: "No users found" });
-		}
-		res.status(200).json(users);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-	};
-
-	// Controller function to create a new user
-	export const create = async (req, res) => {
-	try {
-		const userData = new User(req.body);
-		const { email } = userData;
-
-		const userExists = await User.findOne({ email });
-		if (userExists) {
-			return res.status(400).json({ message: "User already exists" });
-		}
-
-    const savedUser = await userData.save();
-    res.status(201).json(savedUser);
-		} catch (error) {
-			res.status(500).json({ message: error.message });
-	}
-	};
-
-	// Controller function to update a user
-	export const update = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-		new: true,
-	});
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(updatedUser);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-	};
-
-	// Controller function to delete a user
-	export const deleteUser = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const deletedUser = await User.findByIdAndDelete(id);
-		if (!deletedUser) {
-			return res.status(404).json({ message: "User not found" });
-		}
-    res.status(200).json({ message: "User deleted successfully" });
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-	};
-
-
-
-
-userRoutes
---This file defines the API endpoints and connects them to the controller functions (create, fetch, update, deleteUser) from userController.js.
-
-
-	import express from "express";
-	import {
-		fetch,
-		create,
-		update,
-		deleteUser,
-	} from "../controller/userController.js";
-
-	const route = express.Router();
-
-	route.post("/create", create);
-	route.get("/getAllUser", fetch);
-	route.put("/update/:id", update);
-	route.delete("/delete/:id", deleteUser);
-
-	export default route;
 </p></body></html>
