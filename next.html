@@ -1,7 +1,13 @@
 <html><body><p>
 npm init -y<br>
 <br>
-index.js<br>
+	<br>npm i express mongoose body-parser dotenv
+	<br>npm i nodemon
+	<br>npm start
+	<br>
+	<br>
+	<br>
+<h3>index.js</h3><br>
 -- This file sets up and runs the Express server, connects to MongoDB, loads routes, and uses middleware.<br>
 <br>
 	import express from "express";<br>
@@ -36,7 +42,7 @@ index.js<br>
 	app.use("/api/user", route);<br>
 <br>
 <br>
-userModel.js<br>
+<h3>userModel.js</h3><br>
 	import mongoose from "mongoose";<br>
 <br>
 	const userSchema = new mongoose.Schema({<br>
@@ -61,7 +67,7 @@ userModel.js<br>
 	export default mongoose.model("User", userSchema);<br>
 <br>
 <br>
-userController<br>
+<h3>userController.js</h3><br>
 --This file handles CRUD operations: Create, Read (Fetch), Update, Delete users from the MongoDB database using Mongoose.<br>
 <br>
 	import User from "../model/userModel.js";<br>
@@ -129,7 +135,7 @@ userController<br>
 	};<br>
 <br>
 <br>
-userRoutes<br>
+<h3>userRoutes.js</h3><br>
 --This file defines the API endpoints and connects them to the controller functions (create, fetch, update, deleteUser) from userController.js.<br>
 <br>
 	import express from "express";<br>
