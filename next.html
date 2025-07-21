@@ -188,40 +188,40 @@ const App = () => {<br>
           onChange={handleChange}<br>
           required<br>
         /><br>
-        <button type="submit">{user._id ? "Update" : "Create"}</button><br>
-      </form><br>
-
-      <h3>User List</h3><br>
-      <table border={1} style={{ margin: "0 auto", borderCollapse: "collapse" }}><br>
-        <thead><br>
-          <tr><br>
-            <th>Name</th><br>
-            <th>Email</th><br>
-            <th>Address</th><br>
-            <th>Actions</th><br>
-          </tr><br>
-        </thead><br>
-        <tbody><br>
-          {users.map((u) => (<br>
-            <tr key={u._id}><br>
-              <td>{u.name}</td><br>
-              <td>{u.email}</td><br>
-              <td>{u.address}</td><br>
-              <td><br>
-                <button onClick={() => handleEdit(u)}>Edit</button><br>
-                <button onClick={() => handleDelete(u._id)}>Delete</button><br>
-              </td>
-            </tr><br>
-          ))}
-          </tbody><br>
-      </table>
-        </div><br>
-  );
-};<br>
-
-export default App;<br>
 
 
+{/* <button type="submit">{user._id ? "Update" : "Create"}</button><br /> */}
 
+{/* </form><br /> */}
+
+{/* <h3>User List</h3><br /> */}
+
+{/* <table border={1} style={{ margin: "0 auto", borderCollapse: "collapse" }}> */}
+  {/* <thead> */}
+    {/* <tr> */}
+      {/* <th>Name</th> */}
+      {/* <th>Email</th> */}
+      {/* <th>Address</th> */}
+      {/* <th>Actions</th> */}
+    {/* </tr> */}
+  {/* </thead> */}
+  {/* <tbody> */}
+    {/* {users.map((u) => ( */}
+      {/* <tr key={u._id}> */}
+        {/* <td>{u.name}</td> */}
+        {/* <td>{u.email}</td> */}
+        {/* <td>{u.address}</td> */}
+        {/* <td> */}
+          {/* <button onClick={() => handleEdit(u)}>Edit</button> */}
+          {/* <button onClick={() => handleDelete(u._id)}>Delete</button> */}
+        {/* </td> */}
+      {/* </tr> */}
+    {/* ))} */}
+  {/* </tbody> */}
+{/* </table> */}
+
+{/* </div> */}
+
+{/* export default App; */}
 
 </p></body></html>
