@@ -2,6 +2,96 @@
   <body>
     <pre>
 
+      ----index.php----
+<?php 
+session_start();
+include("db.php");
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body><center>
+
+    <!-- Display session message -->
+    <form action="" method="POST">
+        <?php
+        if(isset($_SESSION['message'])){
+            echo $_SESSION['message'];
+            unset($_SESSION['message']);
+        }
+        ?>
+    </form>
+
+    <!-- Search bar -->
+    <form method="POST">
+        Enter Name: <input type="text" name="search" value="<?= isset($_POST['search']) ? htmlspecialchars($_POST['search']) : '' ?>">
+        <button type="submit" name="search-btn">Search</button>
+        <a href="index.php">Reset</a>
+    </form>
+    <br>
+
+    <!-- Product Table -->
+    <table border="2">
+        <tr>
+            <td>id</td>
+            <td>product name</td>
+            <td>discription</td>
+            <td>price</td>
+            <td>quantity</td>
+            <td>Image</td>
+            <td>Edit</td>
+            <td>Delete</td>
+        </tr>
+
+        <?php
+        // Filter query if search is used
+        if(isset($_POST['search-btn']) && !empty(trim($_POST['search']))) {
+            $search = "%" . trim($_POST['search']) . "%";
+            $query = "SELECT * FROM product WHERE product_name LIKE :search";
+            $statement = $conn->prepare($query);
+            $statement->bindParam(':search', $search);
+        } else {
+            $query = "SELECT * FROM product";
+            $statement = $conn->prepare($query);
+        }
+
+        $statement->execute();
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if($result){
+            foreach($result as $item){
+                ?>
+                <tr>
+                    <td><?= $item['id'];?></td>
+                    <td><?= $item['product_name'];?></td>
+                    <td><?= $item['discription'];?></td>
+                    <td><?= $item['price'];?></td>
+                    <td><?= $item['quantity'];?></td>
+                    <td><img src="uploads/<?= $item['photo']; ?>" width="80" height="80" alt="No Image"></td>
+                    <td><a href="edit.php?id=<?= $item['id'];?>">edit</a></td>
+                    <td><a href="delete.php?id=<?= $item['id'];?>">delete</a></td>
+                </tr>
+                <?php
+            }
+        } else {
+            ?>
+            <tr>
+                <td colspan="8">No Record Found...</td>
+            </tr>
+            <?php
+        }
+        ?>
+    </table>
+    <br>
+    <a href="product-add.php">Add Data</a>
+</center>
+</body>
+</html>
+
       
     </pre>
   </body>
