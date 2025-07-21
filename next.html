@@ -1,9 +1,9 @@
-<html><body><p>npm init 
-npm install express dotenv mongoose cors
+<html><body><pre>
+npm init 
+npm install express dotenv mongoose cors 
 npm install --save-dev nodemon
 
-<h3>index.js</h3>
-
+index.js
 import express from "express" 
 import mongoose from "mongoose" 
 import dotenv from "dotenv" 
@@ -12,7 +12,6 @@ import cors from "cors"
 
 const app = express() 
 app.use(cors()) 
-
 app.use(express.json()) 
 dotenv.config() 
 
@@ -21,100 +20,72 @@ const MONGO_URI = process.env.MONGO_URI
 
 mongoose
   .connect(MONGO_URI)
-  .then(() => {
+  .then(() => { 
     console.log("Connected to MongoDB") 
   })
-  .catch((err) => {
+  .catch((err) => { 
     console.error("MongoDB connection error:", err) 
   }) 
 
-app.listen(PORT, () => {
+app.listen(PORT, () => { 
   console.log(Server is running on port ${PORT}) 
 }) 
 
-app.use("/api/user", route) 
+app.use("/api/user", route)
 
-
-
-<h3>userController.js</h3>
-
+userController.js
 import User from "../model/userModel.js" 
 
-export const fetch = async (req, res) => {
-    const users = await User.find() 
-    if (users.length === 0) {
-      return res.status(404).json({ message: "No users found" }) 
-    }
-    res.status(200).json(users) 
+export const fetch = async (req, res) => { 
+  const users = await User.find() 
+  if (users.length === 0) { 
+    return res.status(404).json({ message: "No users found" }) 
+  } 
+  res.status(200).json(users) 
 } 
 
-export const create = async (req, res) => {
-    const {email} = req.body 
-    const userExists = await User.findOne({ email }) 
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" }) 
-    }
-    const newUser=await User.create(req.body) 
-    res.status(201).json({newUser, message: "User created successfully" }) 
+export const create = async (req, res) => { 
+  const { email } = req.body 
+  const userExists = await User.findOne({ email }) 
+  if (userExists) { 
+    return res.status(400).json({ message: "User already exists" }) 
+  } 
+  const newUser = await User.create(req.body) 
+  res.status(201).json({ newUser, message: "User created successfully" }) 
 } 
 
-export const update = async (req, res) => {
-    const { id } = req.params 
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-      new: true,
-    }) 
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" }) 
-    }
-    res.status(200).json(updatedUser) 
+export const update = async (req, res) => { 
+  const { id } = req.params 
+  const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true }) 
+  if (!updatedUser) { 
+    return res.status(404).json({ message: "User not found" }) 
+  } 
+  res.status(200).json(updatedUser) 
 } 
 
-export const deleteUser = async (req, res) => {
-   const { id } = req.params 
-    const deletedUser = await User.findByIdAndDelete(id) 
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" }) 
-    }
-    res.status(200).json({ message: "User deleted successfully" }) 
+export const deleteUser = async (req, res) => { 
+  const { id } = req.params 
+  const deletedUser = await User.findByIdAndDelete(id) 
+  if (!deletedUser) { 
+    return res.status(404).json({ message: "User not found" }) 
+  } 
+  res.status(200).json({ message: "User deleted successfully" }) 
 } 
 
-
-
-<h3>userModel.js</h3>
-
+userModel.js
 import mongoose from "mongoose" 
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 3,
-    maxlength: 50,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  address: {
-    type: String,
-    required: true,
-  },
+const userSchema = new mongoose.Schema({ 
+  name: { type: String, required: true, trim: true, minlength: 3, maxlength: 50 }, 
+  email: { type: String, required: true, unique: true }, 
+  address: { type: String, required: true } 
 }) 
 
-export default mongoose.model("User", userSchema) 
+export default mongoose.model("User", userSchema)
 
-
-<h3>userRoute.js</h3>
-
+userRoute.js
 import express from "express" 
-import {
-  fetch,
-  create,
-  update,
-  deleteUser,
-} from "../controller/userController.js" 
+import { fetch, create, update, deleteUser } from "../controller/userController.js" 
 
 const route = express.Router() 
 
@@ -123,14 +94,11 @@ route.get("/getAllUser", fetch)
 route.put("/update/:id", update) 
 route.delete("/delete/:id", deleteUser) 
 
-export default route 
+export default route
 
-
-
-<h2>Frontend </h2>
-
-npx create-reaxt-app frontend
-npm i axios
+Frontend
+npx create-react-app frontend 
+npm i axios 
 
 import React, { useState, useEffect } from "react"; 
 import axios from "axios"; 
@@ -147,11 +115,11 @@ const App = () => {
     const res = await axios.get("http://localhost:8000/api/user/getAllUser"); 
     setUsers(res.data); 
   }; 
- 
-  const handleChange = (e) => {
+
+  const handleChange = (e) => { 
     setUser({ ...user, [e.target.name]: e.target.value }); 
   }; 
- 
+
   const handleSubmit = async (e) => { 
     e.preventDefault(); 
     if (user._id) { 
@@ -168,62 +136,56 @@ const App = () => {
   }; 
 
   const handleDelete = async (id) => { 
-    await axios.delete(http://localhost:8000/api/user/delete/${id});
+    await axios.delete(http://localhost:8000/api/user/delete/${id}); 
     fetchUsers(); 
-  };
- 
-  return ( 
-    <div style={{ padding: 20, textAlign: "center" }}> 
-      <h2>User Management (CRUD)</h2> 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20 }}> 
-        <input 
-          name="name" 
-          value={user.name} 
-          onChange={handleChange} 
-          required 
-          /> 
-        <input 
-          name="email" 
-          value={user.email} 
-          onChange={handleChange} 
-          required 
-        /> 
-        <input 
-          name="address" 
-          value={user.address} 
-          onChange={handleChange} 
-          required 
-        /> 
-</p>
-<pre>
-  &lt;button type="submit"&gt;{user._id ? "Update" : "Create"}&lt;/button&gt;<br>
-  &lt;/form&gt;<br><br>
+  }; 
 
-  &lt;h3&gt;User List&lt;/h3&gt;<br>
-  &lt;table border=&#123;1&#125; style=&#123;&#123; margin: "0 auto", borderCollapse: "collapse" &#125;&#125;&gt;<br>
-    &lt;thead&gt;<br>
-      &lt;tr&gt;<br>
-        &lt;th&gt;Name&lt;/th&gt;<br>
-        &lt;th&gt;Email&lt;/th&gt;<br>
-        &lt;th&gt;Address&lt;/th&gt;<br>
-        &lt;th&gt;Actions&lt;/th&gt;<br>
-      &lt;/tr&gt;<br>
-    &lt;/thead&gt;<br>
-    &lt;tbody&gt;<br>
-      &#123;users.map((u) =&gt; (<br>
-        &lt;tr key=&#123;u._id&#125;&gt;<br>
-          &lt;td&gt;&#123;u.name&#125;&lt;/td&gt;<br>
-          &lt;td&gt;&#123;u.email&#125;&lt;/td&gt;<br>
-          &lt;td&gt;&#123;u.address&#125;&lt;/td&gt;<br>
-          &lt;td&gt;<br>
-            &lt;button onClick=&#123;() =&gt; handleEdit(u)&#125;&gt;Edit&lt;/button&gt;<br>
-            &lt;button onClick=&#123;() =&gt; handleDelete(u._id)&#125;&gt;Delete&lt;/button&gt;<br>
-          &lt;/td&gt;<br>
-        &lt;/tr&gt;<br>
-      ))&#125;<br>
-    &lt;/tbody&gt;<br>
-  &lt;/table&gt;<br>
-&lt;/div&gt;<br>
-);
+  return (
+    &lt;div style=&#123;&#123; padding: 20, textAlign: "center" &#125;&#125;&gt;
+
+      &lt;h2&gt;User Management (CRUD)&lt;/h2&gt;
+
+      &lt;form onSubmit=&#123;handleSubmit&#125; style=&#123;&#123; marginBottom: 20 &#125;&#125;&gt;
+
+        &lt;input name="name" value=&#123;user.name&#125; onChange=&#123;handleChange&#125; required /&gt;
+        &lt;input name="email" value=&#123;user.email&#125; onChange=&#123;handleChange&#125; required /&gt;
+        &lt;input name="address" value=&#123;user.address&#125; onChange=&#123;handleChange&#125; required /&gt;
+
+        &lt;button type="submit"&gt;&#123;user._id ? "Update" : "Create"&#125;&lt;/button&gt;
+
+      &lt;/form&gt;
+
+      &lt;h3&gt;User List&lt;/h3&gt;
+
+      &lt;table border=&#123;1&#125; style=&#123;&#123; margin: "0 auto", borderCollapse: "collapse" &#125;&#125;&gt;
+
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Name&lt;/th&gt;
+            &lt;th&gt;Email&lt;/th&gt;
+            &lt;th&gt;Address&lt;/th&gt;
+            &lt;th&gt;Actions&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+
+        &lt;tbody&gt;
+          &#123;users.map((u) =&gt; (
+            &lt;tr key=&#123;u._id&#125;&gt;
+              &lt;td&gt;&#123;u.name&#125;&lt;/td&gt;
+              &lt;td&gt;&#123;u.email&#125;&lt;/td&gt;
+              &lt;td&gt;&#123;u.address&#125;&lt;/td&gt;
+              &lt;td&gt;
+                &lt;button onClick=&#123;() =&gt; handleEdit(u)&#125;&gt;Edit&lt;/button&gt;
+                &lt;button onClick=&#123;() =&gt; handleDelete(u._id)&#125;&gt;Delete&lt;/button&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          ))&#125;
+        &lt;/tbody&gt;
+
+      &lt;/table&gt;
+
+    &lt;/div&gt;
+  );
+};
 </pre>
       </body></html>
