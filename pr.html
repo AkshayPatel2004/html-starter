@@ -1,8 +1,25 @@
-<html>
-  <body>
-    <pre>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Code</title>
+    <style>
+        pre {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border: 1px solid #ccc;
+            white-space: pre-wrap; /* for word wrap */
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
 
-      ----index.php----
+<h2>index-php</h2>
+
+<pre>
+<?php
+echo htmlspecialchars('
 <?php 
 session_start();
 include("db.php");
@@ -19,16 +36,16 @@ include("db.php");
     <!-- Display session message -->
     <form action="" method="POST">
         <?php
-        if(isset($_SESSION['message'])){
-            echo $_SESSION['message'];
-            unset($_SESSION['message']);
+        if(isset($_SESSION["message"])){
+            echo $_SESSION["message"];
+            unset($_SESSION["message"]);
         }
         ?>
     </form>
 
     <!-- Search bar -->
     <form method="POST">
-        Enter Name: <input type="text" name="search" value="<?= isset($_POST['search']) ? htmlspecialchars($_POST['search']) : '' ?>">
+        Enter Name: <input type="text" name="search" value="<?= isset($_POST["search"]) ? htmlspecialchars($_POST["search"]) : "" ?>">
         <button type="submit" name="search-btn">Search</button>
         <a href="index.php">Reset</a>
     </form>
@@ -48,12 +65,11 @@ include("db.php");
         </tr>
 
         <?php
-        // Filter query if search is used
-        if(isset($_POST['search-btn']) && !empty(trim($_POST['search']))) {
-            $search = "%" . trim($_POST['search']) . "%";
+        if(isset($_POST["search-btn"]) && !empty(trim($_POST["search"]))) {
+            $search = "%" . trim($_POST["search"]) . "%";
             $query = "SELECT * FROM product WHERE product_name LIKE :search";
             $statement = $conn->prepare($query);
-            $statement->bindParam(':search', $search);
+            $statement->bindParam(":search", $search);
         } else {
             $query = "SELECT * FROM product";
             $statement = $conn->prepare($query);
@@ -66,14 +82,14 @@ include("db.php");
             foreach($result as $item){
                 ?>
                 <tr>
-                    <td><?= $item['id'];?></td>
-                    <td><?= $item['product_name'];?></td>
-                    <td><?= $item['discription'];?></td>
-                    <td><?= $item['price'];?></td>
-                    <td><?= $item['quantity'];?></td>
-                    <td><img src="uploads/<?= $item['photo']; ?>" width="80" height="80" alt="No Image"></td>
-                    <td><a href="edit.php?id=<?= $item['id'];?>">edit</a></td>
-                    <td><a href="delete.php?id=<?= $item['id'];?>">delete</a></td>
+                    <td><?= $item["id"];?></td>
+                    <td><?= $item["product_name"];?></td>
+                    <td><?= $item["discription"];?></td>
+                    <td><?= $item["price"];?></td>
+                    <td><?= $item["quantity"];?></td>
+                    <td><img src="uploads/<?= $item["photo"]; ?>" width="80" height="80" alt="No Image"></td>
+                    <td><a href="edit.php?id=<?= $item["id"];?>">edit</a></td>
+                    <td><a href="delete.php?id=<?= $item["id"];?>">delete</a></td>
                 </tr>
                 <?php
             }
@@ -91,8 +107,228 @@ include("db.php");
 </center>
 </body>
 </html>
+');
+?>
 
-      
-    </pre>
-  </body>
+  
+<h2>code-php</h2>
+  <?php
+session_start();
+include('db.php');
+if(isset($_POST['update-data'])){
+    $stud_id=$_POST['id'];
+    $name=$_POST['productname'];
+    $discription=$_POST['productdescription'];
+    $price=$_POST['productprice'];
+    $quantity=$_POST['productquntity'];
+      $query="update product set product_name=:product_name,discription=:discription,price=:price,quantity=:quantity where id=:s_id limit 1";
+    $statement=$conn->prepare($query);
+    $data=[
+         ':s_id'=>$stud_id ,
+        ':product_name'=>$name,
+        ':discription'=>$discription,
+        ':price'=>$price,
+        ':quantity'=>$quantity
+    ];
+    $_SESSION['message']=" ";
+    $query_execute=$statement->execute($data);
+    if($query_execute){
+       // $_SESSION['message']="Updated";
+        header('Location: index.php');
+        //exit(0);
+    }
+    else{
+        //$_SESSION['message']="Not Updated";
+        header('Location: index.php');
+        //exit(0);
+    }
+}
+if(isset($_POST['save-data'])){
+
+    $name = $_POST['productname'];
+    $discription = $_POST['productdescription'];
+    $price = $_POST['productprice'];
+    $quantity = $_POST['productquntity'];
+
+    // Validate and handle image upload
+    if(isset($_FILES['productphoto']) && $_FILES['productphoto']['error'] === 0){
+        $image = $_FILES['productphoto'];
+        $imageName = $image['name'];
+        $imageTmp = $image['tmp_name'];
+        $imageSize = $image['size'];
+        $imageError = $image['error'];
+
+        $allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
+        $ext = strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
+
+        if(in_array($ext, $allowedExt) && $imageSize <= 2 * 1024 * 1024){
+            $newImageName = uniqid("IMG-", true) . "." . $ext;
+            $uploadPath = "uploads/" . $newImageName;
+            move_uploaded_file($imageTmp, $uploadPath);
+
+            // Insert into DB with image
+            $query = "INSERT INTO product (product_name, discription, price, quantity, photo) 
+                      VALUES (:product_name, :discription, :price, :quantity, :photo)";
+            $run = $conn->prepare($query);
+            $data = [
+                ':product_name' => $name,
+                ':discription' => $discription,
+                ':price' => $price,
+                ':quantity' => $quantity,
+                ':photo' => $newImageName
+            ];
+        } else {
+            $_SESSION['message'] = "Invalid image type or size (max 2MB)";
+            header('Location: product-add.php');
+            exit(0);
+        }
+    } else {
+        $_SESSION['message'] = "Image upload failed.";
+        header('Location: product-add.php');
+        exit(0);
+    }
+
+    $_SESSION['message'] = " ";
+    $query_execute = $run->execute($data);
+    if($query_execute){
+        // $_SESSION['message']="Data inserted...";
+        header('Location: index.php');
+    }
+    else{
+        // $_SESSION['message']="Data Not inserted...";
+        header('Location: index.php');
+    }
+}
+
+if(isset($_POST['delete-data'])){
+    $stud_id=$_POST['id'];
+      $query="delete from product where id=:s_id limit 1";
+    $statement=$conn->prepare($query);
+    $data=[
+         ':s_id'=>$stud_id
+    ];
+    $query_execute=$statement->execute($data);
+    if($query_execute){
+        // $_SESSION['message']="deleted";
+        header('Location: index.php');
+        //exit(0);
+    }
+    else{
+        // $_SESSION['message']="Not deleted";
+        header('Location: index.php');
+        //exit(0);
+    }
+}
+?>
+
+<h2>db-php</h2>
+  <?php
+    
+    $conn = new PDO("mysql:host=localhost;dbname=product2", "root", "");
+    $conn->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+    //echo "connected...";
+?>
+
+<h2>edit-php</h2>
+  <?php
+include('db.php');
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body><center>
+    <?php
+    if(isset($_GET['id'])){
+        $sid=$_GET['id'];
+        $query="select * from product where id=:stud_id limit 1";
+        $statement=$conn->prepare($query);
+        $data=[
+            ':stud_id'=>$sid
+        ];
+        $statement->execute($data);
+        $result=$statement->fetch();
+    }
+    ?>
+    <form action="code.php" method="POST">
+        <h1>Edit Data</h1>
+        <input type="hidden" name="id" value="<?=$result['id'];?>">
+        Enter Name : <input type="text" name="productname" value="<?=$result['product_name'];?>"></br></br>
+        Enter discription : <input type="text" name="productdescription" value="<?=$result['discription'];?>"></br></br>
+        Enter price : <input type="text" name="productprice" value="<?=$result['price'];?>"></br></br>
+        Enter quntity: <input type="text" name="productquntity" value="<?=$result['quantity'];?>"></br></br>
+        <!-- Enter photo : <input type="img" name="productphoto"></br></br> -->
+        <button type="submit" name="update-data">Edit Data</button>
+    </form>
+     <a href="index.php">Back</a>
+</body>
+</html>
+
+<h2>delete-php</h2>
+<?php
+include('db.php');
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body><center>
+    <?php
+    if(isset($_GET['id'])){
+        $sid=$_GET['id'];
+        $query="select * from product where id=:stud_id limit 1";
+        $statement=$conn->prepare($query);
+        $data=[
+            ':stud_id'=>$sid
+        ];
+        $statement->execute($data);
+        $result=$statement->fetch();
+    }
+    ?>
+    <form action="code.php" method="POST">
+        <h1>Edit Data</h1>
+        <input type="hidden" name="id" value="<?=$result['id'];?>">
+        Enter Name : <input type="text" name="productname" value="<?=$result['product_name'];?>"></br></br>
+        Enter discription : <input type="text" name="productdescription" value="<?=$result['discription'];?>"></br></br>
+        Enter price : <input type="text" name="productprice" value="<?=$result['price'];?>"></br></br>
+        Enter quntity: <input type="text" name="productquntity" value="<?=$result['quantity'];?>"></br></br>
+        <!-- Enter photo : <input type="img" name="productphoto"></br></br> -->
+        <button type="submit" name="delete-data">delete Data</button>
+    </form>
+     <a href="index.php">Back</a>
+</body>
+</html>
+<h2>product-add-php</h2>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+</head>
+<body><center>
+    <form action="code.php" method="POST" enctype="multipart/form-data">
+        <h1>Add Data</h1>
+        Enter Name : <input type="text" name="productname" required><br><br>
+        Enter description : <input type="text" name="productdescription" required><br><br>
+        Enter price : <input type="text" name="productprice" required><br><br>
+        Enter quantity: <input type="text" name="productquntity" required><br><br>
+        Upload Image : <input type="file" name="productphoto" accept="image/*" required><br><br>
+        <button type="submit" name="save-data">Add Data</button>
+    </form>
+    <br>
+    <a href="index.php">Back</a>
+</center>
+</body>
+</html>
+
+</pre>
+
+</body>
 </html>
