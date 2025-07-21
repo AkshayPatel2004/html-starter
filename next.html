@@ -1,5 +1,4 @@
-<html><body><pre>
-  npm init 
+<html><body><p>npm init 
 npm install express dotenv mongoose cors
 npm install --save-dev nodemon
 
@@ -130,7 +129,7 @@ export default route
 
 <h2>Frontend </h2>
 
-npx create-reaxt-app frontend
+npx create-reaxt-app frontend
 npm i axios
 
 import React, { useState, useEffect } from "react"; 
@@ -195,37 +194,36 @@ const App = () => {
           onChange={handleChange} 
           required 
         /> 
+</p>
+<pre>
+  &lt;button type="submit"&gt;{user._id ? "Update" : "Create"}&lt;/button&gt;<br>
+  &lt;/form&gt;<br><br>
 
-<button type="submit">{user._id ? "Update" : "Create"}</button> 
-      </form> 
-
-      <h3>User List</h3> 
-      <table border={1} style={{ margin: "0 auto", borderCollapse: "collapse" }}> 
-        <thead> 
-          <tr> 
-            <th>Name</th> 
-            <th>Email</th> 
-            <th>Address</th> 
-            <th>Actions</th> 
-          </tr> 
-        </thead> 
-        <tbody> 
-          {users.map((u) => ( 
-            <tr key={u._id}> 
-              <td>{u.name}</td> 
-              <td>{u.email}</td> 
-              <td>{u.address}</td> 
-              <td> 
-                <button onClick={() => handleEdit(u)}>Edit</button> 
-                <button onClick={() => handleDelete(u._id)}>Delete</button> 
-              </td>
-            </tr> 
-          ))}
-          </tbody> 
-      </table>
-        </div> 
-  );
-}; 
-
-export default App;
-</pre></body></html>
+  &lt;h3&gt;User List&lt;/h3&gt;<br>
+  &lt;table border=&#123;1&#125; style=&#123;&#123; margin: "0 auto", borderCollapse: "collapse" &#125;&#125;&gt;<br>
+    &lt;thead&gt;<br>
+      &lt;tr&gt;<br>
+        &lt;th&gt;Name&lt;/th&gt;<br>
+        &lt;th&gt;Email&lt;/th&gt;<br>
+        &lt;th&gt;Address&lt;/th&gt;<br>
+        &lt;th&gt;Actions&lt;/th&gt;<br>
+      &lt;/tr&gt;<br>
+    &lt;/thead&gt;<br>
+    &lt;tbody&gt;<br>
+      &#123;users.map((u) =&gt; (<br>
+        &lt;tr key=&#123;u._id&#125;&gt;<br>
+          &lt;td&gt;&#123;u.name&#125;&lt;/td&gt;<br>
+          &lt;td&gt;&#123;u.email&#125;&lt;/td&gt;<br>
+          &lt;td&gt;&#123;u.address&#125;&lt;/td&gt;<br>
+          &lt;td&gt;<br>
+            &lt;button onClick=&#123;() =&gt; handleEdit(u)&#125;&gt;Edit&lt;/button&gt;<br>
+            &lt;button onClick=&#123;() =&gt; handleDelete(u._id)&#125;&gt;Delete&lt;/button&gt;<br>
+          &lt;/td&gt;<br>
+        &lt;/tr&gt;<br>
+      ))&#125;<br>
+    &lt;/tbody&gt;<br>
+  &lt;/table&gt;<br>
+&lt;/div&gt;<br>
+);
+</pre>
+      </body></html>
